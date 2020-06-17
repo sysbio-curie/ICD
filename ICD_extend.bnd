@@ -1,0 +1,360 @@
+Node Tumor {
+
+	rate_up = 0.0;
+	rate_down = 0.0;
+}
+Node DC {
+
+
+	rate_up = 0.0;
+	rate_down = 0.0;
+}
+
+Node cd4 {
+	rate_up = 0.0;
+	rate_down = 0.0;
+}
+
+Node cd8 {
+	rate_up = 0.0;
+	rate_down = 0.0;
+}
+
+Node aDC {
+	logic = (DC &  P2X7R);
+	rate_up = @logic ? $u_aDC : 0.0;
+	rate_down = 0.0;
+}
+Node cd4_Act {
+
+	logic = (( IL2_rec | IL4_rec | (CD28 & TCR_II)) & cd4);
+	rate_up = @logic ? $u_cd4_Act : 0.0;
+	rate_down = @logic ? 0.0 : 0.0; // no activation stop stop 
+}
+
+Node P2Y2R {
+
+	logic = (DC);
+	rate_up = @logic ? $u_P2Y2R : 0.0;
+	rate_down = 0.0;
+}
+
+Node P2X7R {
+
+	logic = (DC & P2Y2R);
+	rate_up = @logic ? $u_P2X7R : 0.0;
+	rate_down = 0.0;
+}
+
+Node FPR1 {
+
+	logic = (aDC);
+	rate_up = @logic ? $u_FPR1 : 0.0;
+	rate_down = 0.0;
+}
+
+Node LRP1 {
+
+	logic = (DC & FPR1);
+	rate_up = @logic ? $u_LRP1 : 0.0;
+	rate_down = 0.0;
+}
+
+Node TLR4 {
+	logic = (aDC & LRP1 & FPR1);
+	rate_up = @logic ? $u_TLR4 : 0.0;
+	rate_down = 0.0;
+}
+
+Node IFN1_rec {
+	logic = (Tumor);
+	rate_up = @logic ? $u_IFN1_rec : 0.0;
+	rate_down = 0.0;
+}
+
+Node IL1B_rec {
+
+	logic = (cd4);
+	rate_up = @logic ? $u_IL1B_rec : 0.0;
+	rate_down = @logic ? 0.0 : 0.0;
+}
+
+Node IL2_rec {
+
+	logic = (cd8) | (cd4);
+	rate_up = @logic ? $u_IL2_rec : 0.0;
+	rate_down = @logic ? 0.0 : 0.0;
+}
+
+Node IL4_rec {
+
+	logic = cd4 | Th2;
+	rate_up = @logic ? $u_IL4_rec : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL4_rec;
+}
+
+Node IL6_rec {
+
+	logic = cd4 | Th17;
+	rate_up = @logic ? $u_IL6_rec : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL6_rec;
+}
+
+Node IL12_rec {
+
+	logic = (cd4 & !cd8) | (Th1 & !cd8);
+	rate_up = @logic ? $u_IL12_rec : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL12_rec;
+}
+
+Node IFNg_rec {
+
+	logic = ((cd8 & !cd4)|(!cd8 & cd4));
+	rate_up = @logic ? $u_IFNg_rec : 0.0;
+	rate_down = @logic ? 0.0 : $d_IFNg_rec;
+}
+
+Node IL17_rec {
+
+	logic = (cd4 | CTL);
+	rate_up = @logic ? $u_IL17_rec : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL17_rec;
+}
+
+Node TGFb_rec {
+
+	logic = (cd4);
+	rate_up = @logic ? $u_TGFb_rec : 0.0;
+	rate_down = @logic ? 0.0 : $d_TGFb_rec;
+}
+
+Node CXCR3 {
+
+	logic = ((!cd4 & cd8) | (cd4 & !cd8)) | (CXCR3);
+	rate_up = @logic ? $u_CXCR3 : 0.0;
+	rate_down = 0.0;
+}
+
+
+Node CD28 {
+
+	logic = (((!cd4 & cd8) | (cd4 & !cd8)) & CXCR3) | (CD28); 
+	rate_up = @logic ? $u_CD28 : 0.0;
+	rate_down = 0.0;
+}
+
+ 
+
+Node TCR_I {
+
+	logic = (CD28 & cd8);
+		rate_up = @logic ? $u_TCR_I : 0.0;
+	rate_down = 0.0;
+}
+
+Node TCR_II {
+
+	logic = (cd4 & CD28);
+	rate_up = @logic ? $u_TCR_II : 0.0;
+	rate_down = 0.0;
+}
+
+
+Node Th1 {
+
+	logic = (cd4 & CD28 & TCR_II & IL12_rec) | Th1; //why Th1 ?
+	rate_up = @logic ? $u_Th1 : 0.0;
+	rate_down = 0.0;
+}
+
+Node Th2 {
+
+	logic = (cd4 & CD28 & TCR_II & (IL4_rec | IL2_rec) & !(Th1 | Th17 | Treg)) | Th2; 
+	rate_up = @logic ? $u_Th2 : 0.0;
+	rate_down = 0.0;
+}
+
+
+Node Th17 {
+
+	logic = (cd4 & CD28 & TCR_II) & (IL6_rec | IL1B_rec | TGFb_rec) & !(Th1 | Th2 | Treg) | Th17;
+	rate_up = @logic ? $u_Th17 : 0.0;
+	rate_down = 0.0;
+}
+
+// same mistake and same remark on Th17 self-sustaining
+
+Node Treg {
+
+	logic = (Treg) | ((cd4 & CD28 & TCR_II) & (TGFb_rec | IL2_rec) & !(Th1 | Th2 | Th17)); 
+	rate_up = @logic ? $u_Treg : 0.0;
+	rate_down = 0.0;
+}
+
+// same mistake and same remark on Treg self-sustaining
+
+Node CALR_o {
+
+	logic = (Tumor);
+	rate_up = @logic ? $u_CALR_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_CALR_o;
+}
+
+Node ATP_o {
+
+	logic = (Tumor);
+	rate_up = @logic ? $u_ATP_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_ATP_o;
+}
+
+Node ANXA1_o {
+
+	logic = (Tumor);
+	rate_up = @logic ? $u_ANXA1_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_ANXA1_o;
+}
+
+Node HMGB1_o {
+
+	logic = (Tumor & ANXA1_o);
+	rate_up = @logic ? $u_HMGB1_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_HMGB1_o;
+}
+
+Node CXCL10_o {
+
+	logic = (Tumor & IFN1_rec);
+	rate_up = @logic ? $u_CXCL10_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_CXCL10_o;
+}
+
+Node CD80_o {
+
+	logic = (aDC & TLR4 & LRP1);
+	rate_up = @logic ? $u_CD80_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_CD80_o;
+}
+
+Node MHC_I_o {
+
+	logic = (aDC & TLR4 & LRP1);
+	rate_up = @logic ? $u_MHC_I_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_MHC_I_o;
+}
+
+Node MHC_II_o {
+
+	logic = (aDC & TLR4 & LRP1);
+	rate_up = @logic ? $u_MHC_II_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_MHC_II_o;
+}
+
+Node IL1B_o {
+	
+	logic = (aDC & TLR4 & LRP1);
+	rate_up = @logic ? $u_IL1B_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL1B_o;
+}
+
+Node IL2_o {
+
+	logic = ((cd4 & CD28 & TCR_II) & cd4_Act) | (Th1 & cd4_Act) | (DC & TLR4 & (TCR_II | TCR_I)) | (Th2 & cd4_Act);
+	rate_up = @logic ? $u_IL2_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL2_o;
+}
+
+Node IL4_o {
+
+	logic = (Th2 & cd4_Act) | ((cd4 & CD28 & TCR_II) & cd4_Act) | (preCTL & cd4_Act);
+	rate_up = @logic ? $u_IL4_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL4_o;
+}
+
+Node IL6_o {
+
+	logic = (aDC & TLR4 & TCR_II);
+	rate_up = @logic ? $u_IL6_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL6_o;
+}
+
+Node IL12_o {
+
+	logic = (aDC & TLR4);
+	rate_up = @logic ? $u_IL12_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL12_o;
+}
+
+Node IL17_o {
+
+	logic = (IL1B_rec & Th17 & cd4_Act);
+	rate_up = @logic ? $u_IL17_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IL17_o;
+}
+
+Node IFNg_o {
+
+	logic = (IL12_rec & CTL) | (IFNg_rec & Th1 & cd4_Act) | (IL12_rec & CTL) | ((cd4 & CD28 & TCR_II) & IL12_rec & cd4_Act ) | (IL12_rec & Th1 & cd4_Act);
+	rate_up = @logic ? $u_IFNg_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IFNg_o;
+}
+
+
+
+Node TGFb_o {
+
+	logic = (cd4 & cd4_Act) | (Treg & cd4_Act) | Tumor;
+	rate_up = @logic ? $u_TGFb_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_TGFb_o;
+}
+
+Node Perforin_o {
+
+	logic = CTL;
+	rate_up = @logic ? $u_Perforin_o : 0.0;
+	rate_down = (-log(1-$pop_Tumor))/$PerforinRecycled;
+}
+
+
+Node preCTL {
+
+	logic = (IL2_rec & cd8 & TCR_I);
+	rate_up = @logic ? $u_preCTL : 0.0;
+	rate_down = 0.0;
+}
+
+Node CTL {
+
+	logic = (!IL2_rec & IFNg_rec & preCTL) | (IL2_rec & preCTL);
+	rate_up = @logic ? $u_CTL : 0.0;
+	rate_down = 0 ;
+}
+
+Node IFN1_o {
+
+	logic = (Tumor & TLR4) | (DC & TLR4);
+	rate_up = @logic ? $u_IFN1_o : 0.0;
+	rate_down = @logic ? 0.0 : $d_IFN1_o;
+}
+
+Node Division {
+
+
+	rate_up = (Tumor? $growth_tumor : 0.0) + ((CTL & !(Perforin_o)) ? $clonal_exp_rate : 0.0);
+	rate_down = 0.0;
+}
+
+Node Death {
+	
+	rate_up = (Tumor ? ((-log(1-$rate_perforin)*$aggressivity)+$ChemoEffect) : 0.0) + (Perforin_o ? $PerforinDeath : 0.0); //no death of CTL ?
+	rate_down = 0.0;
+}
+
+// Not yet. But sure we need to implement it. 
+// " During the shut-down of the immune response activated lymphocytes are removed by two mechanisms. 
+// T cells that are restimulated during the end of the immune response die by activation-induced cell death (AICD), 
+// whereas activated lymphocytes which are not restimulated die by activated cell autonomous death (ACAD). " PMID: 18289867
+
+// So far, according to the way I model the production of CTL, it is mediated by adjuvant secretions, that also come from tumor cells.
+//  A reduction of the tumor cells number means a decrease in terms of secretion, hence a decrease of CTLs.
+// I think we must consider a mechanism to reduce the dependency of CTLs to tumor cells.
+

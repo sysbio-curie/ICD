@@ -1,0 +1,28 @@
+death = Death;
+division = Division;
+steps  = 600;	
+MaBoSS = MaBoSS;	
+
+$pop_Tumor u= p[(Tumor) = (1)];
+$rate_CALR_i u= p[(CALR_o) = (1)];
+$rate_ATP_i u= p[(ATP_o) = (1)];
+$rate_HMGB1_i u= p[(HMGB1_o) = (1)];
+$rate_ANXA1_i u= p[(ANXA1_o) = (1)];
+$rate_IFN1_i u= p[(IFN1_o) = (1)];
+$rate_CXCL10_i u= p[(CXCL10_o) = (1)];
+
+$rate_CD80_i u= p[(CD80_o) = (1)];
+$rate_MHC_I_i u= p[(MHC_I_o) = (1)];
+$rate_MHC_II_i u= p[(MHC_II_o) = (1)];
+
+$rate_IL1B_i u= p[(IL1B_o) = (1)];
+$rate_IL2_i u= p[(IL2_o) = (1)];
+$rate_IL4_i u= p[(IL4_o) = (1)];
+$rate_IL6_i u= p[(IL6_o) = (1)];
+$rate_IL12_i u= p[(IL12_o) = (1)];
+$rate_IL17_i u= p[(IL17_o) = (1)];
+
+$rate_IFNg_i u= p[(IFNg_o) = (1)];
+$rate_TGFb_i u= p[(TGFb_o) = (1)];
+$rate_CTLA4_i u= p[(CTLA4_o) = (1)];
+$rate_perforin u= p[(Perforin_o) = (1)];
