@@ -36,7 +36,7 @@ Node aDC {
 Node cd4_Act {
 	logic = (( IL2_rec | IL4_rec | (CD28 & TCR_II)) & cd4);
 	rate_up = @logic ? $u_cd4_Act : 0.0;
-	rate_down = @logic ? 0.0 : 0.0; // no activation stop stop 
+	rate_down = @logic ? 0.0 : 0.0; 
 }
 
 Node P2Y2R {
@@ -73,7 +73,7 @@ Node TLR4 {
 }
 
 Node IFN1_rec {
-	logic = (Tumor); // keep Tumor instead of DyingTumor?
+	logic = (Tumor);
 	rate_up = @logic ? $u_IFN1_rec : 0.0;
 	rate_down = 0.0;
 }
@@ -188,16 +188,12 @@ Node Th17 {
 	rate_down = 0.0;
 }
 
-// same mistake and same remark on Th17 self-sustaining
-
 Node Treg {
 
 	logic = (Treg) | ((cd4 & CD28 & TCR_II) & (TGFb_rec | IL2_rec) & !(Th1 | Th2 | Th17)); 
 	rate_up = @logic ? $u_Treg : 0.0;
 	rate_down = 0.0;
 }
-
-// same mistake and same remark on Treg self-sustaining
 
 Node CALR_o {
 
