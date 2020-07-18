@@ -17,7 +17,7 @@ $u_TCR_I u= $rate_MHC_I_i * p[(MHC_I_o) = (1)];
 $u_TCR_II u= $rate_MHC_II_i * p[(MHC_II_o) = (1)];
 
 $u_IL1B_rec u= $rate_IL1B_i * p[(IL1B_o) = (1)];
-$u_IL2_rec u= $rate_IL2_i;
+$u_IL2_rec u= $rate_IL2_i * (p[(Tumor) = (1)] + p[(DC) = (1)] + p[(cd4) = (1)] + p[(cd8) = (1)]);
 $u_IL4_rec u= $rate_IL4_i * p[(IL4_o) = (1)];
 $u_IL6_rec u= $rate_IL6_i * p[(IL6_o) = (1)];
 $u_IL12_rec u= $rate_IL12_i * p[(IL12_o) = (1)];
