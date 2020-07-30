@@ -1,11 +1,19 @@
 Node Tumor {
-
 	rate_up = 0.0;
 	rate_down = 0.0;
 }
+
+Node ChemoT {
+    rate_up = 0.0;
+    rate_down = $degChemo;
+}
+
+Node DyingTumor {
+    rate_up = (Tumor & ChemoT) ? $effectChemo : 0.0 ;
+    rate_down = 0.0 ;
+}
+
 Node DC {
-
-
 	rate_up = 0.0;
 	rate_down = 0.0;
 }
@@ -26,14 +34,12 @@ Node aDC {
 	rate_down = 0.0;
 }
 Node cd4_Act {
-
 	logic = (( IL2_rec | IL4_rec | (CD28 & TCR_II)) & cd4);
 	rate_up = @logic ? $u_cd4_Act : 0.0;
-	rate_down = @logic ? 0.0 : 0.0; // no activation stop stop 
+	rate_down = @logic ? 0.0 : 0.0; 
 }
 
 Node P2Y2R {
-
 	logic = (DC);
 	rate_up = @logic ? $u_P2Y2R : 0.0;
 	rate_down = 0.0;
@@ -148,7 +154,7 @@ Node CD28 {
 Node TCR_I {
 
 	logic = (CD28 & cd8);
-		rate_up = @logic ? $u_TCR_I : 0.0;
+	rate_up = @logic ? $u_TCR_I : 0.0;
 	rate_down = 0.0;
 }
 
@@ -182,8 +188,6 @@ Node Th17 {
 	rate_down = 0.0;
 }
 
-// same mistake and same remark on Th17 self-sustaining
-
 Node Treg {
 
 	logic = (Treg) | ((cd4 & CD28 & TCR_II) & (TGFb_rec | IL2_rec) & !(Th1 | Th2 | Th17)); 
@@ -191,32 +195,30 @@ Node Treg {
 	rate_down = 0.0;
 }
 
-// same mistake and same remark on Treg self-sustaining
-
 Node CALR_o {
 
-	logic = (Tumor);
+	logic = (DyingTumor);
 	rate_up = @logic ? $u_CALR_o : 0.0;
 	rate_down = @logic ? 0.0 : $d_CALR_o;
 }
 
 Node ATP_o {
 
-	logic = (Tumor);
+	logic = (DyingTumor);
 	rate_up = @logic ? $u_ATP_o : 0.0;
 	rate_down = @logic ? 0.0 : $d_ATP_o;
 }
 
 Node ANXA1_o {
 
-	logic = (Tumor);
+	logic = (DyingTumor);
 	rate_up = @logic ? $u_ANXA1_o : 0.0;
 	rate_down = @logic ? 0.0 : $d_ANXA1_o;
 }
 
 Node HMGB1_o {
 
-	logic = (Tumor & ANXA1_o);
+	logic = (DyingTumor & ANXA1_o);
 	rate_up = @logic ? $u_HMGB1_o : 0.0;
 	rate_down = @logic ? 0.0 : $d_HMGB1_o;
 }
@@ -348,13 +350,4 @@ Node Death {
 	rate_up = (Tumor ? ((-log(1-$rate_perforin)*$aggressivity)+$ChemoEffect) : 0.0) + (Perforin_o ? $PerforinDeath : 0.0); //no death of CTL ?
 	rate_down = 0.0;
 }
-
-// Not yet. But sure we need to implement it. 
-// " During the shut-down of the immune response activated lymphocytes are removed by two mechanisms. 
-// T cells that are restimulated during the end of the immune response die by activation-induced cell death (AICD), 
-// whereas activated lymphocytes which are not restimulated die by activated cell autonomous death (ACAD). " PMID: 18289867
-
-// So far, according to the way I model the production of CTL, it is mediated by adjuvant secretions, that also come from tumor cells.
-//  A reduction of the tumor cells number means a decrease in terms of secretion, hence a decrease of CTLs.
-// I think we must consider a mechanism to reduce the dependency of CTLs to tumor cells.
 
